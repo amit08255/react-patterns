@@ -12,6 +12,8 @@ So the compound components API gives you a nice way to express relationships bet
 
 The `<select>` element implicitly stores state about the selected option and shares that with it's children so they know how to render themselves based on that state. But that state sharing is implicit because there's nothing in our HTML code that can even access the state (and it doesn't need to anyway).
 
+> This pattern allows creating expressive and declarative components, without unnecessary prop drilling. You should consider using this pattern if you want to make your component more customizable, with a better separation of concern and an understandable API.
+
 ```js
 function App() {
   return (
