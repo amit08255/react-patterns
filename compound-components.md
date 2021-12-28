@@ -14,6 +14,12 @@ The `<select>` element implicitly stores state about the selected option and sha
 
 > This pattern allows creating expressive and declarative components, without unnecessary prop drilling. You should consider using this pattern if you want to make your component more customizable, with a better separation of concern and an understandable API.
 
+Instead of jamming all props in one giant parent component and drilling those down to child UI components, here each prop is attached to the SubComponent that makes the most sense.
+
+> Your component has great UI flexibility, allowing the creations of various cases from a single component. For example, the user can change the SubComponents’ order or define which one should be displayed.
+
+Most of the logic is contained in the main component, aReact.Context is then used to share states and handlers all across children. We get a clear division of responsibility.
+
 ```js
 function App() {
   return (
