@@ -105,6 +105,31 @@ function Query(props) {
 
 **Note:** Values under useEffect dependencies are not compared using shallow comparison instead it is compared using direct comparison like: ```val1 === val2```. When an object will contain same value but different instance is passed, then it will be considered a new value.
 
+> Custom value comparison technique in useEffect
+
+```js
+import { useEffect, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
+
+function Query({ query, variables }) {
+  useEffect(() => {
+    if(isEqual(previousInput.current, [query, variables]) {
+      return;
+    }
+
+    console.log("component source value mounted");
+  });
+  
+  const previousInput = useRef();
+  
+  useEffect(() => {
+    previousInput.current = [query, variables];
+  });
+  
+  return <div>Hello</div>;
+}
+```
+
 
 ### useReducer hook
 
