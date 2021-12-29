@@ -50,6 +50,28 @@ function ThemedButton() {
 }
 ```
 
+### useRef hook
+
+* **useRef**: useRef returns a mutable ref object whose .current property is initialized to the passed argument (initialValue). The returned ```object will persist for the full lifetime of the component``` which means useRef will give you the same ref object on every render.
+
+```js
+import {useRef} from 'react';
+
+function TextInputWithFocusButton() {
+  const inputEl = useRef(null);
+  const onButtonClick = () => {
+    // `current` points to the mounted text input element
+    inputEl.current.focus();
+  };
+  return (
+    <>
+      <input ref={inputEl} type="text" />
+      <button onClick={onButtonClick}>Focus the input</button>
+    </>
+  );
+}
+```
+
 
 ### useEffect hook
 
