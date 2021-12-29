@@ -1,4 +1,4 @@
-# Sharing Code with Hooks Pattern
+# React Hooks Patterns
 
 React hooks are great for sharing code between multiple component. We will use functional components for this pattern.
 
@@ -220,3 +220,45 @@ function Query({ query, variables, children, normalize = data => data }) {
 }
 ```
 
+> Safe set state with check if component is mounted to prevent warning showing cannot set state to unmounted component
+
+```js
+import { useReducer, useEffect, useContext, useRef } from 'react';
+
+function Query({ query, variables, children, normalize = data => data }) {
+  const client = useContext(GitHub.Context);
+
+  const [state, setState] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    { loaded: false, fetching: false, data: null, error: null }
+  );
+  
+  const mountedRef = useRef(false);
+  
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => (mountedRef.current = false);
+  }, []);
+  
+  const safeSetState = (...args) => mountedRef.current && setState(...args);
+  
+  useEffect(
+    () => {
+      setState({ fetching: true });
+
+      client.request(query, variables).then(res => safeSetState({
+        data: normalize(res),
+        error: null,
+        loaded: true,
+        fetching: false,
+      })).catch(error => safeSetState({
+        error,
+        data: null,
+        loaded: false,
+        fetching: false,
+      }))
+    }, [query, variables]);
+    
+    return children(state);
+}
+```
