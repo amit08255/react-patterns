@@ -156,7 +156,7 @@ function Query({ query, variables }) {
 ### useReducer hook
 
 * **useReducer**: Allows you to combine multiple states in one place instead of use separate useState for every state.
-Accepts a reducer of type ```(state, action) => newState```, and returns the current state paired with a dispatch method. useReducer is usually ```preferable to useState when you have complex state logic``` that involves multiple sub-values or when the next state depends on the previous one.
+Accepts a reducer of type ```(state, action) => newState```, and returns the current state paired with a dispatch method. useReducer is usually ```preferable to useState when you have complex state logic``` that involves multiple sub-values ```or when the next state depends on the previous one```.
 
 ```js
 const initialState = {count: 0};
