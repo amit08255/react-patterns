@@ -262,3 +262,53 @@ function Query({ query, variables, children, normalize = data => data }) {
     return children(state);
 }
 ```
+
+## Custom Hooks
+
+Building your own Hooks lets you extract component logic into reusable functions. When we want ```to share logic between two JavaScript functions, we extract it to a third function```. Both components and Hooks are functions, so this works for them too!
+
+> A custom Hook is a JavaScript function whose name starts with ”use” and that may call other Hooks.
+
+A custom Hook doesn’t need to have a specific signature. In other words, it’s just like a normal function. ```Its name should always start with use``` so that you can tell at a glance that the rules of Hooks apply to it.
+
+Custom React hooks are an essential tool that let you add special, unique functionality to your React applications.
+
+```js
+import { useReducer, useEffect, useContext } from 'react';
+
+// custom hook function
+function useSetState(initialState) {
+  const [state, setState] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    initialState
+  );
+  
+  return [state, setState];
+}
+
+function Query({ query, variables, children, normalize = data => data }) {
+  const client = useContext(GitHub.Context);
+  
+  // using custom hook
+  const [state, setState] = useSetState({ loaded: false, fetching: false, data: null, error: null });
+  
+  useEffect(
+    () => {
+      setState({ fetching: true });
+
+      client.request(query, variables).then(res => setState({
+        data: normalize(res),
+        error: null,
+        loaded: true,
+        fetching: false,
+      })).catch(error => setState({
+        error,
+        data: null,
+        loaded: false,
+        fetching: false,
+      }))
+    }, [query, variables]);
+    
+    return children(state);
+}
+```
