@@ -312,3 +312,63 @@ function Query({ query, variables, children, normalize = data => data }) {
     return children(state);
 }
 ```
+
+> A custom hook can also use another custom hook
+
+
+```js
+import { useReducer, useEffect, useContext, useRef } from 'react';
+
+// custom hook function
+function useSetState(initialState) {
+  const [state, setState] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    initialState
+  );
+  
+  return [state, setState];
+}
+
+//custom hook function
+function useSafeSetState(initialState) {
+  // using custom hook
+  const [state, setState] = useSetState(initialState);
+  
+  const mountedRef = useRef(false);
+  
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => (mountedRef.current = false);
+  }, []);
+  
+  const safeSetState = (...args) => mountedRef.current && setState(...args);
+  
+  return [state, safeSetState];
+}
+
+function Query({ query, variables, children, normalize = data => data }) {
+  const client = useContext(GitHub.Context);
+
+  // using custom hook
+  const [state, safeSetState] = useSafeSetState({ loaded: false, fetching: false, data: null, error: null });
+  
+  useEffect(
+    () => {
+      useSafeSetState({ fetching: true });
+
+      client.request(query, variables).then(res => safeSetState({
+        data: normalize(res),
+        error: null,
+        loaded: true,
+        fetching: false,
+      })).catch(error => safeSetState({
+        error,
+        data: null,
+        loaded: false,
+        fetching: false,
+      }))
+    }, [query, variables]);
+    
+    return children(state);
+}
+```
