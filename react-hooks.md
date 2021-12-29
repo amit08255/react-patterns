@@ -404,3 +404,80 @@ function Query({ query, variables }) {
   return <div>Hello</div>;
 }
 ```
+
+> Custom hooks with states
+
+These hooks are same as normal components except that they do not return UI component, they return states and other data required
+
+```js
+import { useReducer, useEffect, useContext, useRef } from 'react';
+
+// custom hook function
+function useSetState(initialState) {
+  const [state, setState] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    initialState
+  );
+  
+  return [state, setState];
+}
+
+//custom hook function
+function useSafeSetState(initialState) {
+  // using custom hook
+  const [state, setState] = useSetState(initialState);
+  
+  const mountedRef = useRef(false);
+  
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => (mountedRef.current = false);
+  }, []);
+  
+  const safeSetState = (...args) => mountedRef.current && setState(...args);
+  
+  return [state, safeSetState];
+}
+
+// Stateful custom hook can be used in any component
+function useQuery({ query, variables, normalize = data => data }) {
+  const client = useContext(GitHub.Context);
+
+  // using custom hook
+  const [state, safeSetState] = useSafeSetState({ loaded: false, fetching: false, data: null, error: null });
+  
+  useEffect(
+    () => {
+      useSafeSetState({ fetching: true });
+
+      client.request(query, variables).then(res => safeSetState({
+        data: normalize(res),
+        error: null,
+        loaded: true,
+        fetching: false,
+      })).catch(error => safeSetState({
+        error,
+        data: null,
+        loaded: false,
+        fetching: false,
+      }))
+    }, [query, variables]);
+    
+    return state;
+}
+
+// simple component to use the hook as component. It also makes testing hooks easier using it as component
+const Query = ({ children, ...props }) => children(useQuery(props));
+
+// simple component using the hook
+function DisplayQuery({ query, variables }) {
+
+  const {fetching, data, error} = useQuery({
+    query, variables,
+  });
+  
+  return (
+    <div>{data}</div>
+  );
+}
+```
