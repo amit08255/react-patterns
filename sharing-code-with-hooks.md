@@ -62,7 +62,7 @@ If a function is returned from useEffect, that function will be executed when th
 ```js
 import { useEffect } from 'react';
 
-function Query() {
+function Query(props) {
   useEffect(() => {
     const subscription = props.source.subscribe();
     return () => {
