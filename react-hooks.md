@@ -372,3 +372,35 @@ function Query({ query, variables, children, normalize = data => data }) {
     return children(state);
 }
 ```
+
+> Custom hook to keep track of previous values
+
+```js
+import { useEffect, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
+
+function usePrevious(value) {
+  const ref = useRef();
+  
+  // runs callback every time component renders and updates current value in ref
+  useEffect(() => {
+    ref.current = value;
+  });
+  
+  return ref.current;
+}
+
+function Query({ query, variables }) {
+  useEffect(() => {
+    if(isEqual(previousInput, [query, variables]) {
+      return;
+    }
+
+    console.log("component source value mounted");
+  });
+  
+  const previousInput = usePrevious([query, variables]);
+  
+  return <div>Hello</div>;
+}
+```
