@@ -103,6 +103,8 @@ function Query(props) {
 }
 ```
 
+**Note:** Values under useEffect dependencies are not compared using shallow comparison instead it is compared using direct comparison like: ```val1 === val2```. When an object will contain same value but different instance is passed, then it will be considered a new value.
+
 
 ### useReducer hook
 
