@@ -187,3 +187,222 @@ function Query({ query, variables, children, normalize = data => data }) {
     return children(state);
 }
 ```
+
+## Custom Hooks
+
+Building your own Hooks lets you extract component logic into reusable functions. When we want ```to share logic between two JavaScript functions, we extract it to a third function```. Both components and Hooks are functions, so this works for them too!
+
+> A custom Hook is a JavaScript function whose name starts with ”use” and that may call other Hooks.
+
+A custom Hook doesn’t need to have a specific signature. In other words, it’s just like a normal function. ```Its name should always start with use``` so that you can tell at a glance that the rules of Hooks apply to it.
+
+Custom React hooks are an essential tool that let you add special, unique functionality to your React applications.
+
+```js
+import { useReducer, useEffect, useContext } from 'react';
+
+// custom hook function
+function useSetState(initialState) {
+  const [state, setState] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    initialState
+  );
+  
+  return [state, setState];
+}
+
+function Query({ query, variables, children, normalize = data => data }) {
+  const client = useContext(GitHub.Context);
+  
+  // using custom hook
+  const [state, setState] = useSetState({ loaded: false, fetching: false, data: null, error: null });
+  
+  useEffect(
+    () => {
+      setState({ fetching: true });
+
+      client.request(query, variables).then(res => setState({
+        data: normalize(res),
+        error: null,
+        loaded: true,
+        fetching: false,
+      })).catch(error => setState({
+        error,
+        data: null,
+        loaded: false,
+        fetching: false,
+      }))
+    }, [query, variables]);
+    
+    return children(state);
+}
+```
+
+> A custom hook can also use another custom hook
+
+
+```js
+import { useReducer, useEffect, useContext, useRef } from 'react';
+
+// custom hook function
+function useSetState(initialState) {
+  const [state, setState] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    initialState
+  );
+  
+  return [state, setState];
+}
+
+//custom hook function
+function useSafeSetState(initialState) {
+  // using custom hook
+  const [state, setState] = useSetState(initialState);
+  
+  const mountedRef = useRef(false);
+  
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => (mountedRef.current = false);
+  }, []);
+  
+  const safeSetState = (...args) => mountedRef.current && setState(...args);
+  
+  return [state, safeSetState];
+}
+
+function Query({ query, variables, children, normalize = data => data }) {
+  const client = useContext(GitHub.Context);
+
+  // using custom hook
+  const [state, safeSetState] = useSafeSetState({ loaded: false, fetching: false, data: null, error: null });
+  
+  useEffect(
+    () => {
+      useSafeSetState({ fetching: true });
+
+      client.request(query, variables).then(res => safeSetState({
+        data: normalize(res),
+        error: null,
+        loaded: true,
+        fetching: false,
+      })).catch(error => safeSetState({
+        error,
+        data: null,
+        loaded: false,
+        fetching: false,
+      }))
+    }, [query, variables]);
+    
+    return children(state);
+}
+```
+
+> Custom hook to keep track of previous values
+
+```js
+import { useEffect, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
+
+function usePrevious(value) {
+  const ref = useRef();
+  
+  // runs callback every time component renders and updates current value in ref
+  useEffect(() => {
+    ref.current = value;
+  });
+  
+  return ref.current;
+}
+
+function Query({ query, variables }) {
+  useEffect(() => {
+    if(isEqual(previousInput, [query, variables]) {
+      return;
+    }
+
+    console.log("component source value mounted");
+  });
+  
+  const previousInput = usePrevious([query, variables]);
+  
+  return <div>Hello</div>;
+}
+```
+
+> Custom hooks with states
+
+These hooks are same as normal components except that they do not return UI component, they return states and other data required
+
+```js
+import { useReducer, useEffect, useContext, useRef } from 'react';
+
+// custom hook function
+function useSetState(initialState) {
+  const [state, setState] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    initialState
+  );
+  
+  return [state, setState];
+}
+
+//custom hook function
+function useSafeSetState(initialState) {
+  // using custom hook
+  const [state, setState] = useSetState(initialState);
+  
+  const mountedRef = useRef(false);
+  
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => (mountedRef.current = false);
+  }, []);
+  
+  const safeSetState = (...args) => mountedRef.current && setState(...args);
+  
+  return [state, safeSetState];
+}
+
+// Stateful custom hook can be used in any component
+function useQuery({ query, variables, normalize = data => data }) {
+  const client = useContext(GitHub.Context);
+
+  // using custom hook
+  const [state, safeSetState] = useSafeSetState({ loaded: false, fetching: false, data: null, error: null });
+  
+  useEffect(
+    () => {
+      useSafeSetState({ fetching: true });
+
+      client.request(query, variables).then(res => safeSetState({
+        data: normalize(res),
+        error: null,
+        loaded: true,
+        fetching: false,
+      })).catch(error => safeSetState({
+        error,
+        data: null,
+        loaded: false,
+        fetching: false,
+      }))
+    }, [query, variables]);
+    
+    return state;
+}
+
+// simple component to use the hook as component. It also makes testing hooks easier using it as component
+const Query = ({ children, ...props }) => children(useQuery(props));
+
+// simple component using the hook
+function DisplayQuery({ query, variables }) {
+
+  const {fetching, data, error} = useQuery({
+    query, variables,
+  });
+  
+  return (
+    <div>{data}</div>
+  );
+}
+```
