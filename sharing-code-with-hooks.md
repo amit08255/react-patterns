@@ -6,7 +6,103 @@ React hooks are great for sharing code between multiple component. We will use f
 
 ### useContext hook
 
-* **useContext**: Allows you to use React context in component.
+* **useContext**: Allows you to use React context in component. Accepts a context object (the value returned from React.createContext) and returns the current context value for that context. The current context value is determined by the value prop of the nearest ```<MyContext.Provider>``` above the calling component in the tree. When the nearest ```<MyContext.Provider>``` above the component updates, this Hook will trigger a rerender with the latest context value passed to that MyContext provider.
+
+```js
+import { useContext } from 'react';
+
+const themes = {
+  light: {
+    foreground: "#000000",
+    background: "#eeeeee"
+  },
+  dark: {
+    foreground: "#ffffff",
+    background: "#222222"
+  }
+};
+
+const ThemeContext = React.createContext(themes.light);
+
+function App() {
+  return (
+    <ThemeContext.Provider value={themes.dark}>
+      <Toolbar />
+    </ThemeContext.Provider>
+  );
+}
+
+function Toolbar(props) {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  );
+}
+
+function ThemedButton() {
+  const theme = useContext(ThemeContext);
+  return (
+    <button style={{ background: theme.background, color: theme.foreground }}>
+      I am styled by theme context!
+    </button>
+  );
+}
+```
+
+
+### useEffect hook
+
+* **useEffect**: The function passed to useEffect will run after the render is committed to the screen. By default, effects run after every completed render, but you can choose to fire them only when certain values have changed by passing second parameter which is array of values to check and render when any of them changes.
+When the second parameter is empty array, the callback is called only once when component is mounted. The default behavior for effects is to fire the effect after every completed render.
+If a function is returned from useEffect, that function will be executed when the component is unmounted from screen.  The function passed to useEffect fires after layout and paint, during a deferred event.
+
+> useEffect with callback to run when component unmounts
+
+```js
+import { useEffect } from 'react';
+
+function Query() {
+  useEffect(() => {
+    const subscription = props.source.subscribe();
+    return () => {
+      // Clean up the subscription
+      subscription.unsubscribe();
+    };
+  });
+  
+  return <div>Hello</div>;
+}
+```
+
+> useEffect with empty dependency to call only once when mounted
+
+```js
+import { useEffect } from 'react';
+
+function Query() {
+  useEffect(() => {
+    console.log("component mounted");
+  }, []);
+  
+  return <div>Hello</div>;
+}
+```
+
+> useEffect to execute every time a value changes
+
+```js
+import { useEffect } from 'react';
+
+function Query(props) {
+  useEffect(() => {
+    console.log("component source value mounted");
+  }, [props.source]);
+  
+  return <div>Hello</div>;
+}
+```
+
 
 ### useReducer hook
 
@@ -74,3 +170,4 @@ function Query({ query, variables, children, normalize = data => data }) {
     return children(state);
 }
 ```
+
