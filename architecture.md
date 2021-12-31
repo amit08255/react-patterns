@@ -67,10 +67,10 @@ function EmployeesFetch({ resource }) {
 
 > While isolating changes into separate components is what orthogonality is all about, there could be components that can change for different reasons.
 
-> **Ways of making components orthogonal:**
-> * React hooks
-> * React suspense
-> * Dependency inversion
+**Ways of making components orthogonal:**
+* React hooks
+* React suspense
+* Dependency inversion
 
 
 
