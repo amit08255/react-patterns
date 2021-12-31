@@ -4,7 +4,7 @@ Suppose you want to design a dynamic form with dynamic layout.
 
 ![image](https://user-images.githubusercontent.com/28493237/147811574-39c4c60b-b628-4c09-852d-fda69a55db4c.png)
 
-## Step 1: Build the entire form component.
+## Step 1: Think entire form component as single component.
 
 Suppose you build the entire form in single component. When building complex applications we need to **remember the thumb rule that every component should have single responsibility**.
 
