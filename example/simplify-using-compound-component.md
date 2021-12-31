@@ -22,7 +22,13 @@ When splitting components, we have to make sure it is easy to share states betwe
 function App() {
   return (
     <Question>
-      <Question.Types types={[{ name: 'MCQ', value: 'MCQ', count: 4 }, { name: 'SAQ', value: 'SAQ', count: 0 }, { name: 'LAQ', value: 'LAQ', count: 0 }]} />
+      <Question.Types
+        types={[
+            { name: 'MCQ', value: 'MCQ', count: 4 },
+            { name: 'SAQ', value: 'SAQ', count: 0 },
+            { name: 'LAQ', value: 'LAQ', count: 0 }
+          ]}
+       />
       <Question.Text />
       <Question.Options />
       <Question.Solution />
@@ -96,7 +102,12 @@ function Types({ types }) {
       <Label>Question Type</Label>
       {
         types.map((item, index) => (
-          <RadioButton key={`type-{index + 1}`} onChange={() => onChange(item.value, item.count)} value={item.value} checked={type === item.value}>
+          <RadioButton
+            key={`type-{index + 1}`}
+            onChange={() => onChange(item.value, item.count)}
+            value={item.value}
+            checked={type === item.value}
+          >
             {item.name}
           </RadioButton>
         ))
