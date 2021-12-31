@@ -102,7 +102,7 @@ So the way this works is we create a context with React where we store the state
 
 ## Bonus Tips
 
-### Passing data of all immediate children of a component
+### Wrapping all immediate children of a component
 
 ```React.Children``` provides utilities for dealing with the this.props.children opaque data structure.
 
