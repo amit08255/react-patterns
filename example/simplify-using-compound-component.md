@@ -45,7 +45,7 @@ question component will use this context to get and update states data.
 **When splitting components in high-level view, all child can itself contain other child components for UI of that part.**
 Once splitting on high-level is done, next comes the part of integrating the low-level view of components.
 
-## Step3: Building low-level view of components.
+## Step3: Building high-level view of components.
 
 ```js
 import * as React from 'react'
