@@ -4,7 +4,7 @@ Suppose you want to design a dynamic form with dynamic layout.
 
 ![image](https://user-images.githubusercontent.com/28493237/147811574-39c4c60b-b628-4c09-852d-fda69a55db4c.png)
 
-* **Step 1:** Build the entire form component.
+## Step 1: Build the entire form component.
 
 Suppose you build the entire form in single component. When building complex applications we need to **remember the thumb rule that every component should have single responsibility**.
 
@@ -12,7 +12,7 @@ Now let's add the rest of the requirements:
 
 ![image](https://user-images.githubusercontent.com/28493237/147811687-4752c27a-6844-4b14-af62-e91234cd0f94.png)
 
-* **Step2:** Split components to make every component responsible for one thing.
+## Step 2: Split components to make every component responsible for one thing.
 
 ![image](https://user-images.githubusercontent.com/28493237/147812476-ae0bbcea-7c36-4715-8598-87ddb843239d.png)
 
@@ -45,7 +45,7 @@ question component will use this context to get and update states data.
 **When splitting components in high-level view, all child can itself contain other child components for UI of that part.**
 Once splitting on high-level is done, next comes the part of integrating the low-level view of components.
 
-**Step3:** Building low-level view of components.
+## Step3: Building low-level view of components.
 
 ```js
 import * as React from 'react'
