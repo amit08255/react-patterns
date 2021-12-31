@@ -22,7 +22,7 @@ When splitting components, we have to make sure it is easy to share states betwe
 function App() {
   return (
     <Question>
-      <Question.Types types={[{ name: 'MCQ', value: 'MCQ' }, { name: 'SAQ', value: 'SAQ' }, { name: 'LAQ', value: 'LAQ' }]} />
+      <Question.Types types={[{ name: 'MCQ', value: 'MCQ', count: 4 }, { name: 'SAQ', value: 'SAQ', count: 0 }, { name: 'LAQ', value: 'LAQ', count: 0 }]} />
       <Question.Text />
       <Question.Options />
       <Question.Solution />
@@ -84,14 +84,19 @@ function useQuestionContext() {
 }
 
 function Types({ types }) {
-  const { type } = useQuestionContext();
+  const { type, onTypeChange, onOptionChange } = useQuestionContext();
+  
+  const onChange = (value, count) => {
+    onOptionChange(Array(count).fill(''));
+    onTypeChange(value);
+  };
   
   return (
     <>
       <Label>Question Type</Label>
       {
         types.map((item, index) => (
-          <RadioButton key={`type-{index + 1}`} value={item.value} checked={type === item.value}>
+          <RadioButton key={`type-{index + 1}`} onChange={() => onChange(item.value, item.count)} value={item.value} checked={type === item.value}>
             {item.name}
           </RadioButton>
         ))
@@ -102,26 +107,36 @@ function Types({ types }) {
 
 
 function Text() {
-  const { text } = useQuestionContext();
+  const { text, onQuestionChange } = useQuestionContext();
   
   return (
     <>
       <Label>Question</Label>
-      <TextArea value={text} />
+      <TextArea value={text} onChange={onQuestionChange} />
     </>
   );
 }
 
 
 function Options() {
-  const { options } = useQuestionContext();
+  const { options, onOptionChange } = useQuestionContext();
+  
+  const onChange = (index, val) => {
+    const optList = [...options];
+    optList[index] = val;
+    onOptionChange(optList);
+  };
+  
+  if(options.length < 1){
+    return null;
+  }
   
   return (
     <>
       <Label>Options</Label>
       {
         options.map((item, index) => (
-          <Input type="text" key={`opt-${index + 1}`} value={item} />
+          <Input type="text" key={`opt-${index + 1}`} value={item} onChange={(x) => onChange(index, x)} />
         ))
       }
     </>
@@ -130,31 +145,39 @@ function Options() {
 
 
 function Solution() {
-  const { solution } = useQuestionContext();
+  const { solution, onSolutionChange } = useQuestionContext();
+  
+  if(options.length > 0) {
+    return null;
+  }
   
   return (
     <>
       <Label>Solution</Label>
-      <TextArea value={solution} />
+      <TextArea value={solution} onChange={onSolutionChange} />
     </>
   );
 }
 
 
 function Answer() {
-  const { answer } = useQuestionContext();
+  const { answer, onAnswerChange } = useQuestionContext();
+  
+  if(options.length < 1) {
+    return null;
+  }
   
   return (
     <>
       <Label>Answer</Label>
-      <Input type="text" value={answer} />
+      <Input type="text" value={answer} onChange={onAnswerChange} />
     </>
   );
 }
 
 
 function Submit({ onSubmit }) {
-  const { solution, text, options, type, answer } = useToggleContext();
+  const { solution, text, options, type, answer } = useQuestionContext();
   
   const onClick = () => {
     onSubmit({ type, options, answer, text, solution });
