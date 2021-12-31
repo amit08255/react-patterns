@@ -98,4 +98,36 @@ Toggle.Button = Button
 
 
 
-So the way this works is we create a context with React where we store the state and a mechanism for updating the state. Then the <Toggle> component is responsible for providing that context value to the rest of the react tree
+So the way this works is we create a context with React where we store the state and a mechanism for updating the state. Then the ```<Toggle>``` component is responsible for providing that context value to the rest of the react tree.
+
+## Bonus Tips
+
+### Passing data of all immediate children of a component
+
+```React.Children``` provides utilities for dealing with the this.props.children opaque data structure.
+
+```React.Children.map(children, function)```: Invokes a function on every immediate child contained within children with this set to thisArg. If children is an array it will be traversed and the function will be called for each child in the array. If children is null or undefined, this method will return null or undefined rather than an array.
+
+```js
+// Wrap all immediate children inside button
+
+function Tester(props) {
+  return (
+    <>
+      {
+        React.Children.map(props.children, (item) => (
+          <button>{item}</button>
+        ))
+      }
+    </>
+  )
+}
+```
+
+**Note:** If children is a Fragment it will be treated as a single child and not traversed.
+
+```React.Children.forEach(children, function)```: Like React.Children.map() but does not return an array.
+
+```React.Children.count(children)```: Returns the total number of components in children, equal to the number of times that a callback passed to map or forEach would be invoked.
+
+```React.Children.only(children)```: Verifies that children has only one child (a React element) and returns it. Otherwise this method throws an error.
