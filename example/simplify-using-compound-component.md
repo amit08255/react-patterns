@@ -211,3 +211,165 @@ export default Question;
 
 Above example is basic overview of compound component usage to design highly flexible component. We split a large component into small components responsible for one single responsibility.
 All data required by these child components are provided by parent context. Notice that these child components are totally stateless and hence highly flexible.
+
+
+## Bonus Step: Convert Compound Component to API
+
+This step will allow you to use same type of data and states in multiple types of component without thinking about it's implementation.
+**Trick is to convert all UI code to child component and data will be passed to them as props.**
+
+```js
+import * as React from 'react'
+
+const QuestionContext = React.createContext()
+
+function Question(props) {
+  const [state, setState] = React.useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    { type: 'MCQ', options: ['', '', '', ''], answer: '', solution: '', text: '' }
+  );
+  
+  const onQuestionChange = (text) => setState({ text });
+  const onOptionChange = (options) => setState({ options });
+  const onTypeChange = (type) => setState({ type });
+  const onSolutionChange = (solution) => setState({ solution });
+  const onAnswerChange = (answer) => setState({ answer });
+
+  const value = { ...state, onQuestionChange, onOptionChange, onTypeChange, onSolutionChange, onAnswerChange };
+
+  return (
+    <QuestionContext.Provider value={value}>
+      {props.children}
+    </QuestionContext.Provider>
+  )
+}
+
+function useQuestionContext() {
+  const context = React.useContext(QuestionContext)
+  if (!context) {
+    throw new Error(
+      `Question type components cannot be rendered outside the Question component`,
+    )
+  }
+  return context
+}
+
+function Types({ types, component }) {
+  const { type, onTypeChange, onOptionChange } = useQuestionContext();
+  const Child = component;
+  
+  const onChange = (value, count) => {
+    onOptionChange(Array(count).fill(''));
+    onTypeChange(value);
+  };
+  
+  return (
+    <Child types={types} onChange={onChange} value={type} />
+  );
+}
+
+
+function Text({ component }) {
+  const { text, onQuestionChange } = useQuestionContext();
+  const Child = component;
+  
+  return (
+    <Child onChange={onQuestionChange} value={text} />
+  );
+}
+
+
+function Options({ component }) {
+  const { options, onOptionChange } = useQuestionContext();
+  const Child = component;
+  
+  const onChange = (index, val) => {
+    const optList = [...options];
+    optList[index] = val;
+    onOptionChange(optList);
+  };
+  
+  if(options.length < 1){
+    return null;
+  }
+  
+  return (
+    <Child onChange={onChange} options={options} />
+  );
+}
+
+
+function Solution({ component }) {
+  const { solution, onSolutionChange } = useQuestionContext();
+  const Child = component;
+  
+  if(options.length > 0) {
+    return null;
+  }
+  
+  return (
+    <Child onChange={onSolutionChange} value={solution} />
+  );
+}
+
+
+function Answer({ component }) {
+  const { answer, onAnswerChange } = useQuestionContext();
+  const Child = component;
+  
+  if(options.length < 1) {
+    return null;
+  }
+  
+  return (
+    <Child onChange={onAnswerChange} value={answer} />
+  );
+}
+
+
+function Submit({ onSubmit, component }) {
+  const { solution, text, options, type, answer } = useQuestionContext();
+  const Child = component;
+  
+  const onClick = () => {
+    onSubmit({ type, options, answer, text, solution });
+  };
+  
+  return (
+    <Child onClick={onClick} />
+  );
+}
+
+Question.Submit = Submit
+Question.Answer = Answer
+Question.Solution = Solution
+Question.Options = Options
+Question.Text = Text
+Question.Types = Types
+
+export default Question;
+```
+
+This technique adds an abstraction and flexibility to the designed compound component. It allows the component to be so flexible that you don't have to worry about how UI is created. The compound component acting as an API handles all the data and states. It works similar to High Order Component where you pass components as props and those component don't have to worry about states. As long as child component has same props, it will always work. **This technique improves reusability of your component.**
+
+```js
+function App() {
+  return (
+    <Question>
+      <Question.Types
+        component={InlineRadioList}
+        types={[
+            { name: 'MCQ', value: 'MCQ', count: 4 },
+            { name: 'SAQ', value: 'SAQ', count: 0 },
+            { name: 'LAQ', value: 'LAQ', count: 0 }
+          ]}
+       />
+      <Question.Text component={TextArea} />
+      <Question.Options component={TextInputList} />
+      <Question.Solution component={TextArea} />
+      <Question.Answer component={TextInput} />
+      <Question.Submit component={Button} onSubmit={que => console.log(que)} />
+    </Question>
+  )
+}
+```
