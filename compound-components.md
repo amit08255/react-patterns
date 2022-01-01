@@ -115,7 +115,7 @@ function Tester(props) {
   return (
     <>
       {
-        React.Children.map(props.children, (item) => (
+        React.Children.map(props.children, (item, index) => (
           <button>{item}</button>
         ))
       }
