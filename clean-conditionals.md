@@ -238,3 +238,29 @@ export function App(props) {
   );
 }
 ```
+
+**Example2:**
+
+```tsx
+
+export function App(props) {
+  const day = 'Monday';
+
+  return (
+    <RenderWhen>
+      <RenderWhen.If isTrue={day === 'Sunday'}>
+        Let's go to picnic!
+      </RenderWhen.If>
+      <RenderWhen.If isTrue={day === 'Saturday'}>
+        Let's plan for weekend man!
+      </RenderWhen.If>
+      <RenderWhen.If isTrue={day === 'Friday'}>
+        Party tonight
+      </RenderWhen.If>
+      <RenderWhen.If isTrue>
+        Boring weekdays
+      </RenderWhen.If>
+    </RenderWhen>
+  );
+}
+```
