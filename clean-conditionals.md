@@ -174,25 +174,43 @@ const RenderData = ({ data }) => {
 
 It works similar to if-else and switch case. If first condition gets true in the children tree, then only that one will be executed.
 An optional props `limit` will allow to limit the number of true conditions to render at a time. By default limit is 1.
+There is another optional props `isTrue` in ReactWhen which allows you to set condition for entire parent conditional component.
 
 ```tsx
-import React from 'react';
+import * as React from 'react';
 
-const RenderWhen = ({ limit = 1, children }) => {
+type WhenProps = {
+    children: React.ReactNode,
+    isTrue?: boolean,
+    limit?: number,
+};
+
+const RenderWhen = ({ limit, isTrue, children }:WhenProps) => {
     const list = [];
 
-    React.Children.map(children, (child, index) => {
-        const { isTrue } = child.props;
+    if (isTrue !== true) {
+        return null;
+    }
 
-        if (isTrue === true && index < limit) {
-          list.push(child);
+    React.Children.map(children, (child:any, index) => {
+        const { isTrue: isChildTrue } = child?.props || {};
+
+        if (isChildTrue === true && index < limit) {
+            list.push(child);
         }
     });
 
     return list;
-}
+};
+
+RenderWhen.defaultProps = {
+    limit: 1,
+    isTrue: true,
+};
 
 RenderWhen.If = ({ children, isTrue }) => children;
+
+export default RenderWhen;
 ```
 
 **Example:**
