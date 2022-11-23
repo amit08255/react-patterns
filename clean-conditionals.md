@@ -169,3 +169,49 @@ const RenderData = ({ data }) => {
   );
 }
 ```
+
+### Conditional Operator Component To Limit Number Of True Conditions
+
+It works similar to if-else and switch case. If first condition gets true in the children tree, then only that one will be executed.
+An optional props `limit` will allow to limit the number of true conditions to render at a time. By default limit is 1.
+
+```tsx
+import React from 'react';
+
+const RenderWhen = ({ limit = 1, children }) => {
+    const list = [];
+
+    React.Children.map(children, (child, index) => {
+        const { isTrue } = child.props;
+
+        if (isTrue === true && index < limit) {
+          list.push(child);
+        }
+    });
+
+    return list;
+}
+
+RenderWhen.If = ({ children, isTrue }) => children;
+```
+
+**Example:**
+
+```tsx
+import React from 'react';
+
+export function App(props) {
+  const x = 2;
+
+  return (
+    <RenderWhen>
+      <RenderWhen.If isTrue={x === 2}>
+        Hello 2
+      </RenderWhen.If>
+      <RenderWhen.If isTrue={x === 2}>
+        Bye 2
+      </RenderWhen.If>
+    </RenderWhen>
+  );
+}
+```
