@@ -177,6 +177,7 @@ An optional props `limit` will allow to limit the number of true conditions to r
 There is another optional props `isTrue` in ReactWhen which allows you to set condition for entire parent conditional component.
 
 ```tsx
+/* eslint-disable react/jsx-no-useless-fragment */
 import * as React from 'react';
 
 type WhenProps = {
@@ -186,7 +187,7 @@ type WhenProps = {
 };
 
 const RenderWhen = ({ limit, isTrue, children }:WhenProps) => {
-    const list = [];
+    const list:React.ReactNode[] = [];
 
     if (isTrue !== true) {
         return null;
@@ -200,7 +201,11 @@ const RenderWhen = ({ limit, isTrue, children }:WhenProps) => {
         }
     });
 
-    return list;
+    return (
+        <>
+            {list}
+        </>
+    );
 };
 
 RenderWhen.defaultProps = {
