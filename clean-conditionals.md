@@ -192,10 +192,10 @@ const RenderWhen = ({ limit, isTrue, children }:WhenProps) => {
         return null;
     }
 
-    React.Children.map(children, (child:any, index) => {
+    React.Children.map(children, (child:any) => {
         const { isTrue: isChildTrue } = child?.props || {};
 
-        if (isChildTrue === true && index < limit) {
+        if (isChildTrue === true && list.length < limit) {
             list.push(child);
         }
     });
